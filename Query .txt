@@ -1,0 +1,67 @@
+select distinct
+  O100344.PERSON_CODE  as unique_loader_ID,
+O100344.FIRST_NAME as first_name,
+O100344.LAST_NAME as last_name,
+case when (O100339.EMAIL_ADDRESS is null or O100339.EMAIL_ADDRESS = '') then O100349.EMAIL_ADDRESS else O100339.EMAIL_ADDRESS  end registration_email_address,
+--   O100339.EMAIL_ADDRESS as registration_email_address,
+case  O100344.GENDER when '01' then 1 else 2 end as Gender,
+--null record_action_1,
+replace(replace(replace(O100349.PHONE_NUMBER,'(',''),') ',''),'-','') as mobile_phone_1,
+null user_type,
+null site_username,
+null record_action_2,
+null  email2,
+O100349.EMAIL_ADDRESS as  email3,
+null  mobile_carrier_1,
+replace(replace(replace(O100349.CELLULAR_NUMBER,'(',''),') ',''),'-','') as  mobile_phone_2,
+null  mobile_carrier_2,
+replace(replace(replace(O100349.ALT_PHONE_NUMBER ,'(',''),') ',''),'-','') as mobile_phone_3,
+null mobile_carrier_3,
+null landline_phone_1,
+null landline_phone_1_extension,
+null landline_phone_2,
+null landline_phone_2_extension,
+null landline_phone_3,
+null landline_phone_3_extension,
+null mobile_1_voice_preference,
+null mobile_2_voice_preference,
+null mobile_3_voice_preference,
+null building_attribute_1,
+null department_attribute_2,
+null on_off_campus_attribute_3,
+null class_attribute_4,
+null language_preference,
+null notify_by_sms,
+null notify_by_email
+
+FROM
+P2K.P2K_CM_DEPARTMENTS O100213,
+P2K.P2K_CM_DEPARTMENT_DETAILS O100214,
+P2K.P2K_CM_EMPLOYMENT_STATUSES O100216,
+P2K.P2K_HR_ASSIGNMENTS O100338,
+P2K.P2K_HR_ASSIGNMENT_DETAILS O100339,
+P2K.P2K_HR_EMPLOYMENTS O100343,
+P2K.P2K_HR_IDENTITIES O100344,
+P2K.P2K_HR_PERSONALS O100349,
+P2K.P2K_CM_STATE_PROVINCES O100350
+WHERE
+(
+      ( O100213.ID = O100214.DDP_ID )
+  AND ( O100213.ID = O100339.DDP_ID )
+  AND ( O100216.ID = O100339.DES_ID )
+  AND ( O100338.ID = O100339.EAS_ID )
+  AND ( O100343.ID = O100338.EEM_ID )
+  AND ( O100344.ID = O100343.EID_ID )
+  AND ( O100344.ID = O100349.EID_ID )
+  AND ( O100349.DSP_ID_ADDRESS = O100350.ID )
+
+)
+AND ( O100344.ID = P2K.P2K_PEDPR.EE_ALLOWED(O100344.ID,'EID') )
+AND ( O100339.EFFECTIVE <= sysdate and O100339.EXPIRY >= sysdate)
+AND ( O100349.EFFECTIVE <= sysdate AND O100349.EXPIRY >= sysdate)
+AND (PRIME_ASSIGNMENT = 1)
+--AND(O100249.DUN_ID = '101')
+and O100216.status_code in('ACTIVE','ACTIVE-REGULAR','LOA-FMLA EE')
+and  trunc(O100214.EXPIRY)  = to_date('31/12/3999','dd/mm/yyyy')
+
+
